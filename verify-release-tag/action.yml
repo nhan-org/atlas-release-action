@@ -9,7 +9,7 @@ inputs:
     required: true
   githubToken:
     description: 'The token used to checkout the repo'
-    required: false
+    required: true
 outputs:
   release-version:
     description: "Release version"
@@ -28,7 +28,7 @@ runs:
 
     - uses: actions/checkout@v2
       with:
-        #token: ${{ inputs.githubToken }}
+        token: ${{ inputs.githubToken }}
         ref: ${{ inputs.branch }}
         fetch-depth: 0
 
