@@ -54,12 +54,15 @@ runs:
 
     - name: Checkout tag commit
       run: git checkout ${{ inputs.release-version }}
+      shell: bash
 
     - name: Update version in pom.xml
       run: atlas-mvn -B versions:set -DnewVersion=${{ inputs.release-version }} -DgenerateBackupPoms=false
+      shell: bash
 
     - name: Packaging
       run: atlas-mvn package
+      shell: bash
 
     - name: Get artifactId
       id: get_artifact_id
@@ -90,6 +93,7 @@ runs:
         git stash
         git checkout ${{ inputs.branch }}
       if: steps.version_changed.outputs.value == 'true'
+      shell: bash
 
     - name: Get head tag
       id: get_head_tag
