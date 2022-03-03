@@ -34,16 +34,16 @@ runs:
 
     - name: Get tagged branches
       id: tagged_branches
-      run: echo "::set-output name=value::$(git branch --contains ${{ steps.release-version.outputs.value }} | sed 's/^[ \t\*]*//;s/[ \t]*$//' | jq -R . | jq -s -c .)"
+      run: echo "::set-output name=value::$(git branch --contains ${{ inputs.tag }} | sed 's/^[ \t\*]*//;s/[ \t]*$//' | jq -R . | jq -s -c .)"
       shell: bash
       
     - name: Print tagged branches
       run: echo ${{ steps.tagged_branches.outputs.value }}
       shell: bash
 
-    - name: Fail if ${{ inputs.branch }} does not contain the tag
+    - name: Fail if ${{ inputs.branch }} does not contain the tag ${{ inputs.tag }}
       run: |
-        echo "Branch ${{ inputs.branch }} does not contain tag ${{ steps.release-version.outputs.value }}. Exit now!
+        echo "Branch ${{ inputs.branch }} does not contain tag ${{ inputs.tag }}. Exit now!
         exit -1
       if: contains(fromJSON(steps.tagged_branches.outputs.value), inputs.branch) == false
       shell: bash
