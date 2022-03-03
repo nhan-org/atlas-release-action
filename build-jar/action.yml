@@ -9,7 +9,7 @@ inputs:
     required: true
   githubToken:
     description: 'The token used to checkout the repo'
-    required: false
+    required: true
 outputs:
   should-bump-version:
     description: "Should bump new version to pom.xml"
@@ -85,7 +85,7 @@ runs:
     - name: Upload jar as asset to release
       uses: softprops/action-gh-release@v1
       with:
-        #token: ${{ inputs.githubToken }}
+        token: ${{ inputs.githubToken }}
         files: target/${{ steps.get_jar_file.outputs.name }}
 
     - name: Checkout ${{ inputs.branch }} branch
