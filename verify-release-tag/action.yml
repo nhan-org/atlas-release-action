@@ -41,5 +41,5 @@ runs:
       run: |
         echo "Tagged branch ${{ steps.get_tagged_branch.outputs.value }} is not ${{ inputs.branch }} branch. Exit now!
         exit -1
-      if: contains(fromJSON('["${{ inputs.branch }}", "* ${{ inputs.branch }}"]'), steps.get_tagged_branch.outputs.value) == 'true'
+      if: contains(fromJSON('["release-action", "* release-action"]'), steps.get_tagged_branch.outputs.value) == 'true'
       shell: bash
