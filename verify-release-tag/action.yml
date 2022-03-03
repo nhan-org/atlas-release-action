@@ -1,0 +1,45 @@
+name: 'Verify Release Tag'
+description: 'Verify release tag'
+inputs:
+  tag:
+    description: 'The release tag'
+    required: true
+  branch:
+    description: 'The release branch to checkout'
+    required: true
+  githubToken:
+    description: 'The token used to checkout the repo'
+    required: true
+outputs:
+  release-version:
+    description: "Release version"
+    value: ${{ steps.release-version.outputs.value }}
+runs:
+  using: 'composite'
+  steps:
+    - name: Get release version
+      id: release-version
+      run: echo ::set-output name=value::${{ inputs.tag }}
+      shell: bash
+
+    - name: Print tag version
+      run: echo ${{ steps.release-version.outputs.value }}
+      shell: bash
+
+    - uses: actions/checkout@v2
+      with:
+        token: ${{ inputs.githubToken }}
+        ref: ${{ inputs.branch }}
+        fetch-depth: 0
+
+    - name: Get tagged branch
+      id: get_tagged_branch
+      run: echo "::set-output name=value::$(git branch --contains ${{ steps.release-version.outputs.value }} | tail -1 | sed 's/^[ \t]*//;s/[ \t]*$//')"
+      shell: bash
+
+    - name: Fail if tagged branch is not ${{ inputs.branch }}
+      run: |
+        echo "Tagged branch ${{ steps.get_tagged_branch.outputs.value }} is not ${{ inputs.branch }} branch. Exit now!
+        exit -1
+      if: contains(fromJSON('["${{ inputs.branch }}", "* ${{ inputs.branch }}"]'), steps.get_tagged_branch.outputs.value) == 'true'
+      shell: bash

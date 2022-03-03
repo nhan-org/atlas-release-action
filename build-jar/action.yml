@@ -1,0 +1,120 @@
+name: 'Build Jar'
+description: 'Build server app to jar files'
+inputs:
+  release-version:
+    description: 'The release version'
+    required: true
+  branch:
+    description: 'The release branch to checkout'
+    required: true
+  githubToken:
+    description: 'The token used to checkout the repo'
+    required: true
+outputs:
+  should-bump-version:
+    description: "Should bump new version to pom.xml"
+    value: ${{ steps.should_bump_version.outputs.value }}
+runs:
+  using: 'composite'
+  steps:
+    - name: Install Atlas-SDK
+      id: install_atlas_sdk
+      run: |
+        sudo sh -c 'echo "deb https://packages.atlassian.com/debian/atlassian-sdk-deb/ stable contrib" >> /etc/apt/sources.list'
+        wget https://packages.atlassian.com/api/gpg/key/public
+        sudo apt-key add public
+        sudo apt-get update
+        sudo apt-get install atlassian-plugin-sdk
+        atlas-version
+      shell: bash
+
+    - name: Install Java and Maven
+      uses: actions/setup-java@v2
+      with:
+        distribution: 'adopt'
+        java-version: '8'
+
+    - name: Get current version
+      id: get_current_version
+      run: echo "::set-output name=value::$(atlas-mvn help:evaluate -Dexpression=project.version -q -DforceStdout | grep -v '\[' | tail -1)"
+      shell: bash
+
+    - name: Print current version
+      run: echo ${{ steps.get_current_version.outputs.value }}
+      shell: bash
+
+    - name: Check if version changed
+      id: version_changed
+      run: echo "::set-output name=value::${{ inputs.release-version != steps.get_current_version.outputs.value }}"
+      shell: bash
+
+    - name: Print version changed
+      run: echo ${{ steps.version_changed.outputs.value }}
+      shell: bash
+
+    - name: Checkout tag commit
+      run: git checkout ${{ inputs.release-version }}
+
+    - name: Update version in pom.xml
+      run: atlas-mvn -B versions:set -DnewVersion=${{ inputs.release-version }} -DgenerateBackupPoms=false
+
+    - name: Packaging
+      run: atlas-mvn package
+
+    - name: Get artifactId
+      id: get_artifact_id
+      run: echo "::set-output name=value::$(atlas-mvn help:evaluate -Dexpression=project.artifactId -q -DforceStdout | grep -v '\[' | tail -1)"
+      shell: bash
+
+    - name: Get jar file name
+      id: get_jar_file
+      run: |
+        echo "::set-output name=name::${{ steps.get_artifact_id.outputs.value }}-${{ inputs.release-version }}.jar"
+        echo "::set-output name=archive::${{ steps.get_artifact_id.outputs.value }}-${{ inputs.release-version }}"
+      shell: bash
+
+    - name: Archive for download
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ steps.get_jar_file.outputs.archive }}
+        path: target/${{ steps.get_jar_file.outputs.name }}
+
+    - name: Upload jar as asset to release
+      uses: softprops/action-gh-release@v1
+      with:
+        token: ${{ inputs.githubToken }}
+        files: target/${{ steps.get_jar_file.outputs.name }}
+
+    - name: Checkout ${{ inputs.branch }} branch
+      run: |
+        git stash
+        git checkout ${{ inputs.branch }}
+      if: steps.version_changed.outputs.value == 'true'
+
+    - name: Get head tag
+      id: get_head_tag
+      run: echo "::set-output name=value::$(git tag --points-at HEAD || tail -1)"
+      if: steps.version_changed.outputs.value == 'true'
+      shell: bash
+
+    - name: Print head tag
+      run: echo ${{ steps.get_head_tag.outputs.value }}
+      shell: bash
+
+    - name: Check if the new tag is at head
+      id: tag_at_head
+      run: echo "::set-output name=value::${{ inputs.release-version == steps.get_head_tag.outputs.value }}"
+      shell: bash
+
+    - name: Print is new tag at head
+      run: echo ${{ steps.tag_at_head.outputs.value }}
+      shell: bash
+
+    - name: Check if should bump version
+      id: should_bump_version
+      run: echo "::set-output name=value::${{ steps.version_changed.outputs.value == 'true' && steps.tag_at_head.outputs.value == 'true' }}"
+      shell: bash
+
+    - name: Print should bump version
+      run: echo ${{ steps.should_bump_version.outputs.value }}
+      shell: bash
