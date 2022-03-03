@@ -34,7 +34,7 @@ runs:
 
     - name: Get tagged branches
       id: tagged_branches
-      run: echo "::set-output name=value::$(git branch --contains ${{ steps.release-version.outputs.value }} | sed 's/^[ \t\*]*//;s/[ \t]*$//' | jq -R . | jq -s ."
+      run: echo "::set-output name=value::$(git branch --contains ${{ steps.release-version.outputs.value }} | sed 's/^[ \t\*]*//;s/[ \t]*$//' | jq -R . | jq -s .)"
       shell: bash
       
     - name: Print tagged branches
