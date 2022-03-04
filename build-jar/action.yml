@@ -63,11 +63,11 @@ runs:
       shell: bash
 
     - name: Update version in pom.xml
-      run: atlas-mvn -B versions:set -DnewVersion=${{ inputs.release-version }} -DgenerateBackupPoms=false
+      run: atlas-mvn -q -B versions:set -DnewVersion=${{ inputs.release-version }} -DgenerateBackupPoms=false
       shell: bash
 
     - name: Packaging
-      run: atlas-mvn package
+      run: atlas-mvn -q package
       shell: bash
 
     - name: Get artifactId
