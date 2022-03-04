@@ -34,7 +34,7 @@ runs:
 
     - name: Check if branch ${{ inputs.branch }} contain tag ${{ inputs.tag }}
       id: branch-contains-tag
-      run: echo "::set-output name=value::$(git branch --contains ${{ inputs.tag }} | sed 's/^[ \t\*]*//;s/[ \t]*$//' | jq -R . | jq -s -c . | jq '.|any(. == "${{ inputs.branch }}")' )"
+      run: echo "::set-output name=value::$(git branch --contains ${{ inputs.tag }} | grep -E '(^|\s)${{ inputs.branch }}')"
       shell: bash
       
     - name: Print branch-contains-tag
@@ -45,5 +45,5 @@ runs:
       run: |
         echo "Branch ${{ inputs.branch }} does not contain tag ${{ inputs.tag }}. Exit now!"
         exit -1
-      if: steps.branch-contains-tag.outputs.value == 'false'
+      if: steps.branch-contains-tag.outputs.value == ''
       shell: bash
