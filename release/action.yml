@@ -21,7 +21,7 @@ runs:
   steps:
     - name: Verify release tag
       id: verify-release-tag
-      uses: ../verify-release-tag
+      uses: ./verify-release-tag
       with:
         tag: ${{ inputs.tag }}
         branch: ${{ inputs.branch }}
@@ -29,18 +29,18 @@ runs:
 
     - name: Setup node environment
       id: setup-node-env
-      uses: ../setup-node
+      uses: ./setup-node
 
     - name: Build and upload jar files to release assets
       id: build-jars
-      uses: ../build-jar
+      uses: ./build-jar
       with:
         release-version: ${{ steps.verify-release-tag.outputs.release-version }}
         branch: ${{ inputs.branch }}
         githubToken: ${{ inputs.githubToken }}
 
     - name: Release to marketplace
-      uses: ../marketplace
+      uses: ./marketplace
       with:
         addonKey: ${{ inputs.addonKey }}
         filePath: ${{ steps.build-jar.outputs.file-path }}
