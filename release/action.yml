@@ -32,7 +32,7 @@ runs:
       uses: nhan-org/atlas-release-action/setup-node@main
 
     - name: Build and upload jar files to release assets
-      id: build-jars
+      id: build-jar
       uses: nhan-org/atlas-release-action/build-jar@main
       with:
         release-version: ${{ steps.verify-release-tag.outputs.release-version }}
