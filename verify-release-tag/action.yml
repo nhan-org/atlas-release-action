@@ -38,7 +38,7 @@ runs:
       shell: bash
       
     - name: Print branch-contains-tag
-      run: echo ${{ steps.branch-contains-tag.outputs.value }}
+      run: echo '${{ steps.branch-contains-tag.outputs.value }}'
       shell: bash
 
     - name: Fail if ${{ inputs.branch }} does not contain the tag ${{ inputs.tag }}
