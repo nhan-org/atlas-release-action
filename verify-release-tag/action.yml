@@ -32,18 +32,18 @@ runs:
         ref: ${{ inputs.branch }}
         fetch-depth: 0
 
-    - name: Get tagged branches
-      id: tagged_branches
-      run: echo "::set-output name=value::$(git branch --contains ${{ inputs.tag }} | sed 's/^[ \t\*]*//;s/[ \t]*$//' | jq -R . | jq -s -c .)"
+    - name: Check if branch ${{ inputs.branch }} contain tag ${{ inputs.tag }}
+      id: branch-contains-tag
+      run: echo "::set-output name=value::$(git branch --contains ${{ inputs.tag }} | sed 's/^[ \t\*]*//;s/[ \t]*$//' | jq -R . | jq -s -c . | jq '.|any(. == "${{ inputs.branch }}")' )"
       shell: bash
       
-    - name: Print tagged branches
-      run: echo ${{ steps.tagged_branches.outputs.value }}
+    - name: Print branch-contains-tag
+      run: echo ${{ steps.branch-contains-tag.outputs.value }}
       shell: bash
 
     - name: Fail if ${{ inputs.branch }} does not contain the tag ${{ inputs.tag }}
       run: |
-        echo "Branch ${{ inputs.branch }} does not contain tag ${{ inputs.tag }}. Exit now!
+        echo "Branch ${{ inputs.branch }} does not contain tag ${{ inputs.tag }}. Exit now!"
         exit -1
-      if: contains(fromJSON(steps.tagged_branches.outputs.value), inputs.branch) == false
+      if: steps.branch-contains-tag.outputs.value == 'false'
       shell: bash
