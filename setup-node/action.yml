@@ -14,8 +14,12 @@ runs:
   using: 'composite'
   steps:
     - name: Check if package.json is exist
-      id: should-install
+      id: is-node-project
       run: echo ::set-output name=value::$(test -e package.json && echo true || echo false)
+      shell: bash
+
+    - name: Print is node project
+      run: echo ${{ steps.is-node-project.value }}
       shell: bash
 
     - name: Extract npm and node version
@@ -23,22 +27,22 @@ runs:
       run: |
         echo ::set-output name=node::$(cat package.json | jq '.engines.node')
         echo ::set-output name=npm::$(cat package.json | jq '.engines.npm')
-      if: steps.should-install.value == 'true'
+      if: steps.is-node-project.value == 'true'
       shell: bash
 
     - name: Fails if the version of npm or node is missing
       run: |
         echo "Version of npm or node is missing"
         exit -1
-      if: (${{ steps.engines.npm }} == '' || ${{ steps.engines.node }} == '') && steps.should-install.value == 'true'
+      if: (steps.engines.npm == '' || steps.engines.node == '') && steps.is-node-project.value == 'true'
       shell: bash
 
     - uses: actions/setup-node@v2
       with:
         node-version: ${{ steps.engines.node }}
-      if: steps.should-install.value == 'true'
+      if: steps.is-node-project.value == 'true'
 
     - name: Use npm version ${{ steps.engines.npm }}
       run: npm install npm@${{ steps.engines.npm }}
-      if: steps.should-install.value == 'true'
+      if: steps.is-node-project.value == 'true'
       shell: bash
