@@ -30,7 +30,7 @@ runs:
       run: |
         echo "Version of npm or node is missing"
         exit -1
-      if: ${{ steps.engines.npm }} == '' || ${{ steps.engines.node }} == ''
+      if: (${{ steps.engines.npm }} == '' || ${{ steps.engines.node }} == '') && steps.should-install.value == 'true'
       shell: bash
 
     - uses: actions/setup-node@v2
