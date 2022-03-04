@@ -4,9 +4,6 @@ inputs:
   addonKey:
     description: 'Addon key'
     required: true
-  tag:
-    description: 'The release version'
-    required: true
   branch:
     description: 'The release branch to checkout'
     required: true
@@ -23,7 +20,6 @@ runs:
       id: verify-release-tag
       uses: nhan-org/atlas-release-action/verify-release-tag@main
       with:
-        tag: ${{ inputs.tag }}
         branch: ${{ inputs.branch }}
         githubToken: ${{ inputs.githubToken }}
 

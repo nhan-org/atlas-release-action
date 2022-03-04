@@ -1,9 +1,6 @@
 name: 'Verify Release Tag'
 description: 'Verify release tag'
 inputs:
-  tag:
-    description: 'The release tag'
-    required: true
   branch:
     description: 'The release branch to checkout'
     required: true
@@ -19,7 +16,7 @@ runs:
   steps:
     - name: Get release version
       id: release-version
-      run: echo ::set-output name=value::${{ inputs.tag }}
+      run: echo ::set-output name=value::${{ github.event.release.tag_name }}
       shell: bash
 
     - name: Print tag version
