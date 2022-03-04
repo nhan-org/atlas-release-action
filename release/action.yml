@@ -21,7 +21,7 @@ runs:
   steps:
     - name: Verify release tag
       id: verify-release-tag
-      uses: ./verify-release-tag
+      uses: nhan-org/atlas-release-action/verify-release-tag@main
       with:
         tag: ${{ inputs.tag }}
         branch: ${{ inputs.branch }}
@@ -29,18 +29,18 @@ runs:
 
     - name: Setup node environment
       id: setup-node-env
-      uses: ./setup-node
+      uses: nhan-org/atlas-release-action/setup-node@main
 
     - name: Build and upload jar files to release assets
       id: build-jars
-      uses: ./build-jar
+      uses: nhan-org/atlas-release-action/build-jar@main
       with:
         release-version: ${{ steps.verify-release-tag.outputs.release-version }}
         branch: ${{ inputs.branch }}
         githubToken: ${{ inputs.githubToken }}
 
     - name: Release to marketplace
-      uses: ./marketplace
+      uses: nhan-org/atlas-release-action/marketplace@main
       with:
         addonKey: ${{ inputs.addonKey }}
         filePath: ${{ steps.build-jar.outputs.file-path }}
