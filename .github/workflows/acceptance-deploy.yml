@@ -2,9 +2,6 @@
 name: 'Deploy Acceptance'
 concurrency:
   group: acceptance
-defaults:
-  run:
-    working-directory: connect
 on:
   push:
     branches: ["develop"]

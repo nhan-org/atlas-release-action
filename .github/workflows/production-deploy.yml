@@ -2,9 +2,6 @@
 name: 'Deploy Production'
 concurrency:
   group: prod
-defaults:
-  run:
-    working-directory: connect
 on:
   push:
     branches: ["main"]

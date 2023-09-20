@@ -1,9 +1,5 @@
 ---
 name: Deploy
-defaults:
-  run:
-    working-directory: connect
-    shell: bash
 on:
   workflow_call:
     inputs:
