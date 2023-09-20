@@ -15,6 +15,6 @@ jobs:
     environment: ${{ inputs.target }}
 
     steps:
-      - name: Print version changed
+      - name: Print environment
         run: echo "Test env ${{ inputs.target }}"
         shell: bash
