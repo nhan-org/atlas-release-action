@@ -1,0 +1,20 @@
+---
+name: Deploy
+on:
+  workflow_call:
+    inputs:
+      target:
+        description: 'An environment to target for deployment'
+        required: true
+        type: string
+
+jobs:
+  deploy:
+    name: Deployment
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.target }}
+
+    steps:
+      - name: Print version changed
+        run: echo "Test env ${{ inputs.target }}"
+        shell: bash

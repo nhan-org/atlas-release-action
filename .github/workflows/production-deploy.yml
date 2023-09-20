@@ -1,0 +1,13 @@
+---
+name: 'Deploy Production'
+concurrency:
+  group: prod
+on:
+  push:
+    branches: ["main"]
+jobs:
+  call-deploy:
+    uses: ./.github/workflows/deploy.yml
+    with:
+      target: prod
+    secrets: inherit
