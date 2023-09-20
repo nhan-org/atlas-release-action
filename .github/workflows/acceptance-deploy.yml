@@ -1,0 +1,16 @@
+---
+name: 'Deploy Acceptance'
+concurrency:
+  group: acceptance
+defaults:
+  run:
+    working-directory: connect
+on:
+  push:
+    branches: ["develop"]
+jobs:
+  call-deploy:
+    uses: ./.github/workflows/deploy.yml
+    with:
+      target: acc
+    secrets: inherit
